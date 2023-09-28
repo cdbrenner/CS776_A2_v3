@@ -148,16 +148,68 @@ void Population::stats_o()
 
 void Population::report(int generation)
 {
-    std::ofstream out(options.output_file, std::ios::app);
-    out << std::fixed << std::setprecision(options.print_precision) << generation << ",\t\t" << min << ",\t\t" << average << ",\t\t" << max << "," << std::endl;
-    out.close();
+    if(options.GA_iteration == 0)
+    {
+        std::ofstream out(options.output_file, std::ios::app);
+        out << std::fixed << std::setprecision(options.print_precision) << generation << ",\t\t" << min << ",\t\t" << average << ",\t\t" << max << "," << std::endl;
+        out.close();
+    }
+    else
+    {
+        std::string temp;
+        std::string min_prev_str;
+        std::string ave_prev_str;
+        std::string max_prev_str;
+        std::ifstream in(options.input_file);
+        for(int i = 0; i < generation + 1; i++)
+        {
+            getline(in,temp);
+        }
+        getline(in,temp,',');
+        getline(in,min_prev_str,',');
+        getline(in,ave_prev_str,',');
+        getline(in,max_prev_str,',');
+        double min_prev = atof(min_prev_str.c_str());
+        double ave_prev = atof(ave_prev_str.c_str());
+        double max_prev = atof(max_prev_str.c_str());
+
+        std::ofstream out(options.output_file, std::ios::app);
+        out << std::fixed << std::setprecision(options.print_precision) << generation << ",\t\t" << min + min_prev << ",\t\t" << average + ave_prev << ",\t\t" << max + max_prev << "," << std::endl;
+        out.close();
+    }
 }
 
 void Population::report_o(int generation)
 {
-    std::ofstream out(options.output_file_o, std::ios::app);
-    out << std::fixed << std::setprecision(options.print_precision_o) << generation << ",\t\t" << min_objective << ",\t\t" << average_objective << ",\t\t" << max_objective << "," << std::endl;
-    out.close();
+    if(options.GA_iteration == 0)
+    {
+        std::ofstream out(options.output_file_o, std::ios::app);
+        out << std::fixed << std::setprecision(options.print_precision_o) << generation << ",\t\t" << min_objective << ",\t\t" << average_objective << ",\t\t" << max_objective << "," << std::endl;
+        out.close();
+    }
+    else
+    {
+        std::string temp;
+        std::string min_prev_str;
+        std::string ave_prev_str;
+        std::string max_prev_str;
+        std::ifstream in(options.input_file_o);
+        for(int i = 0; i < generation + 1; i++)
+        {
+            getline(in,temp);
+        }
+        getline(in,temp,',');
+        getline(in,min_prev_str,',');
+        getline(in,ave_prev_str,',');
+        getline(in,max_prev_str,',');
+        double min_prev = atof(min_prev_str.c_str());
+        double ave_prev = atof(ave_prev_str.c_str());
+        double max_prev = atof(max_prev_str.c_str());
+
+        std::ofstream out(options.output_file_o, std::ios::app);
+        out << std::fixed << std::setprecision(options.print_precision_o) << generation << ",\t\t" << min_objective + min_prev << ",\t\t" << average_objective + ave_prev << ",\t\t" << max_objective + max_prev << "," << std::endl;
+        out.close();
+    }
 }
 
 void Population::generation(Population* child, int srand_offset)

@@ -166,6 +166,7 @@ double deJong_F4(Individual& individual, int random_seed, int srand_offset)
     return fitness;
 }
 
+//MAX FITNESS SHOULD BE 1.0
 double deJong_F5(Individual& individual)
 {
     int a[2][25] = {{-32,-16,0,16,32,-32,-16,0,16,32,-32,-16,0,16,32,-32,-16,0,16,32,-32,-16,0,16,32},
@@ -187,7 +188,7 @@ double deJong_F5(Individual& individual)
 
     double objective_function = 0.002 + objective_function_pt2;
 
-    fitness = (double)1/(objective_function + 1);
+    fitness = (double)1/objective_function;
 
     deleter(variables);
 
@@ -294,7 +295,7 @@ double deJong_F5_o(Individual& individual)
 
     double objective_function = 0.002 + objective_function_pt2;
 
-    fitness = (double)1/(objective_function + 1);
+    fitness = (double)1/objective_function;
 
     deleter(variables);
 

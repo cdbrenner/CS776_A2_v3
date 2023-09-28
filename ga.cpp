@@ -1,25 +1,39 @@
 #include "ga.h"
 
-GA::GA(int argc, char *argv[], int eval_option)
+GA::GA(int argc, char *argv[], int eval_option, int it)
 {
-    setup_options(argc, argv, eval_option);
+    setup_options(argc, argv, eval_option, it);
 }
 
-void GA::setup_options(int argc, char *argv[], int eval_option)
+void GA::setup_options(int argc, char *argv[], int eval_option, int it)
 {
-    options.random_seed = time(NULL);
-    options.input_file = "input.txt";
+    std::stringstream ss1;
+    std::stringstream ss2;
+    std::string temp1;
+    std::string temp2;
+    int previous = it - 1;
+    ss1 << it;
+    ss1 >> temp1;
+    ss2 << previous;
+    ss2 >> temp2;
+
+    options.GA_iteration = it;
+    options.random_seed = time(NULL) + it;
 
     switch(eval_option)
     {
         case 1:
             options.chromosome_length = 27;
-            options.population_size = 50;
-            options.max_generations = 100;
+            options.population_size = 100;
+            options.max_generations = 200;
             options.probability_mutation = 0.001;
             options.probability_x = 0.7;
-            options.output_file = "output_deJong_F1.txt";
-            options.output_file_o = "output_deJong_F1_O.txt";
+            options.input_file = "output_deJong_F1_" + temp2 + ".txt";
+            options.input_file_o = "output_deJong_F1_O_" + temp2 + ".txt";
+            options.output_file = "output_deJong_F1_" + temp1 + ".txt";
+            options.output_file_o = "output_deJong_F1_O_" + temp1 + ".txt";
+            options.ave_file = "output_deJong_F1_AVE.txt";
+            options.ave_file_o = "output_deJong_F1_O_AVE.txt";
             options.print_precision = 2;
             options.print_precision_o = 5;
             break;
@@ -29,8 +43,12 @@ void GA::setup_options(int argc, char *argv[], int eval_option)
             options.max_generations = 1000;
             options.probability_mutation = 0.001;
             options.probability_x = 0.7;
-            options.output_file = "output_deJong_F2.txt";
-            options.output_file_o = "output_deJong_F2_O.txt";
+            options.input_file = "output_deJong_F2_" + temp2 + ".txt";
+            options.input_file_o = "output_deJong_F2_O_" + temp2 + ".txt";
+            options.output_file = "output_deJong_F2_" + temp1 + ".txt";
+            options.output_file_o = "output_deJong_F2_O_" + temp1 + ".txt";
+            options.ave_file = "output_deJong_F2_AVE.txt";
+            options.ave_file_o = "output_deJong_F2_O_AVE.txt";
             options.print_precision = 2;
             options.print_precision_o = 5;
             break;
@@ -40,8 +58,12 @@ void GA::setup_options(int argc, char *argv[], int eval_option)
             options.max_generations = 400;
             options.probability_mutation = 0.001;
             options.probability_x = .7;
-            options.output_file = "output_deJong_F3.txt";
-            options.output_file_o = "output_deJong_F3_O.txt";
+            options.input_file = "output_deJong_F3_" + temp2 + ".txt";
+            options.input_file_o = "output_deJong_F3_O_" + temp2 + ".txt";
+            options.output_file = "output_deJong_F3_" + temp1 + ".txt";
+            options.output_file_o = "output_deJong_F3_O_" + temp1 + ".txt";
+            options.ave_file = "output_deJong_F3_AVE.txt";
+            options.ave_file_o = "output_deJong_F3_O_AVE.txt";
             options.print_precision = 2;
             options.print_precision_o = 2;
             break;
@@ -51,8 +73,12 @@ void GA::setup_options(int argc, char *argv[], int eval_option)
             options.max_generations = 400;
             options.probability_mutation = 0.001;
             options.probability_x = 0.7;
-            options.output_file = "output_deJong_F4.txt";
-            options.output_file_o = "output_deJong_F4_O.txt";
+            options.input_file = "output_deJong_F4_" + temp2 + ".txt";
+            options.input_file_o = "output_deJong_F4_O_" + temp2 + ".txt";
+            options.output_file = "output_deJong_F4_" + temp1 + ".txt";
+            options.output_file_o = "output_deJong_F4_O_" + temp1 + ".txt";
+            options.ave_file = "output_deJong_F4_AVE.txt";
+            options.ave_file_o = "output_deJong_F4_O_AVE.txt";
             options.print_precision = 5;
             options.print_precision_o = 2;
             break;
@@ -62,8 +88,12 @@ void GA::setup_options(int argc, char *argv[], int eval_option)
             options.max_generations = 100;
             options.probability_mutation = 0.001;
             options.probability_x = 0.7;
-            options.output_file = "output_deJong_F5.txt";
-            options.output_file_o = "output_deJong_F5_O.txt";
+            options.input_file = "output_deJong_F5" + temp2 + ".txt";
+            options.input_file_o = "output_deJong_F5_O" + temp2 + ".txt";
+            options.output_file = "output_deJong_F5" + temp1 + ".txt";
+            options.output_file_o = "output_deJong_F5_O" + temp1 + ".txt";
+            options.ave_file = "output_deJong_F5_AVE.txt";
+            options.ave_file_o = "output_deJong_F5_O_AVE.txt";
             options.print_precision = 5;
             options.print_precision_o = 5;
             break;
@@ -99,6 +129,7 @@ void GA::run(int eval_option)
         parent->generation(child, i);
         child->evaluate(eval_option, options.random_seed, i*options.population_size);
         child->evaluate_o(eval_option, options.random_seed, i*options.population_size);
+
         child->stats();
         child->stats_o();
         child->report(i);
@@ -107,5 +138,16 @@ void GA::run(int eval_option)
         Population *temp = parent;
         parent = child;
         child = temp;
+    }
+
+    report_cleanup();
+}
+
+void GA::report_cleanup()
+{
+    if(options.GA_iteration != 0)
+    {
+        std::remove(options.input_file.c_str());
+        std::remove(options.input_file_o.c_str());
     }
 }
