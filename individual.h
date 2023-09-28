@@ -7,6 +7,7 @@ class Individual
         int chromosome_length;
         int* chromosome = nullptr;
         double fitness;
+        double objective_value;
         
         //VARIABLES FOR TESTING PROBABILITY ACCURACY
         double mutation_count = 0;
@@ -19,10 +20,12 @@ class Individual
 
         void set_chromosome_length(int);
         void set_fitness(double);
+        void set_objective_value(double);
 
         int get_chromosome_length();
         int* get_chromosome();
         double get_fitness();
+        double get_objective_value();
         
         //FUNCTIONS FOR TESTING PROBABILITY ACCURACY
         double get_mutation_percentage();

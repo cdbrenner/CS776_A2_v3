@@ -30,6 +30,11 @@ void Individual::set_fitness(double fitness)
     this->fitness = fitness;
 }
 
+void Individual::set_objective_value(double objective_value)
+{
+    this->objective_value = objective_value;
+}
+
 int Individual::get_chromosome_length()
 {
     return chromosome_length;
@@ -43,6 +48,11 @@ int* Individual::get_chromosome()
 double Individual::get_fitness()
 {
     return fitness;
+}
+
+double Individual::get_objective_value()
+{
+    return objective_value;
 }
 
 double Individual::get_mutation_percentage()

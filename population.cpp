@@ -3,12 +3,6 @@
 Population::Population()
 {
     average = min = max = sum_fitness = -1;
-
-    //TEST
-    for(int i = 0; i < options.population_size; i++)
-    {
-        proportional_fitnesses[i] = 0;
-    }
     for(int i = 0; i < options.population_size; i++)
     {
         member_chosen_count[i] = 0;
@@ -25,9 +19,6 @@ Population::Population(Options options)
     {
         members[i].set_chromosome_length(this->options.chromosome_length);
         members[i].init(options.random_seed, i);
-
-        //TEST
-        // members[i].print_ind();
     }
 }
 
@@ -41,9 +32,6 @@ Population::Population(Options options, int srand_offset)
     {
         members[i].set_chromosome_length(this->options.chromosome_length);
         members[i].init(options.random_seed, srand_offset*options.population_size + i);
-
-        //TEST
-        // members[i].print_ind();
     }
 }
 
@@ -52,10 +40,6 @@ Population::~Population()
     if(members != nullptr)
     {
         delete[] members;
-
-        //TEST
-        // delete[] proportional_fitnesses;
-        // delete[] member_chosen_count;
     }
 }
 
@@ -72,9 +56,6 @@ void Population::set_members()
     {
         members[i].set_chromosome_length(this->options.chromosome_length);
         members[i].init(options.random_seed, i);
-
-        //TEST
-        // members[i].print_ind();
     }
 }
 
@@ -86,9 +67,6 @@ void Population::set_members(int srand_offset)
     {
         members[i].set_chromosome_length(this->options.chromosome_length);
         members[i].init(options.random_seed, srand_offset*options.population_size + i);
-
-        //TEST
-        // members[i].print_ind();
     }
 }
 
@@ -102,9 +80,6 @@ void Population::get_member_chosen_stats()
     double total = 0;
     for(int i = 0; i < options.population_size; i++)
     {
-        //TEST
-        std::cout << "MEM_CHOSEN_COUNT[" << i << "] = " << member_chosen_count[i] <<std::endl;
-
         total += member_chosen_count[i];
     }
 
@@ -123,18 +98,19 @@ void Population::evaluate(int choice, int random_seed, int srand_offset)
     double fitness = -1;
     for(int i = 0; i < options.population_size; i++)
     {
-        //TEST
-        // std::cout << "POPULATION CALL TO EVAL = " << i << std::endl;
-
         fitness = eval(members[i], choice, random_seed, srand_offset + i);
-
-        //TEST
-        // std::cout << "FITNESS FROM EVAL = " << fitness << std::endl;
-
         members[i].set_fitness(fitness);
+    }
+}
 
-        //TEST
-        // std::cout << "AFTER SETTING FITNESS, MEM[" << i << "] = " << members[i].get_fitness() << std::endl;
+//choice chooses which objective function to evaluate
+void Population::evaluate_o(int choice, int random_seed, int srand_offset)
+{
+    double objective_value = -1;
+    for(int i = 0; i < options.population_size; i++)
+    {
+        objective_value = eval_o(members[i], choice, random_seed, srand_offset + i);
+        members[i].set_objective_value(objective_value);
     }
 }
 
@@ -147,23 +123,40 @@ void Population::stats()
     {
         fitness = members[i].get_fitness();
 
-        //TEST
-        // std::cout << "FITNESS OF MEM[" << i << "] = " << fitness << std::endl;
-
         sum_fitness += fitness;
         fitness < min ? min = fitness : 0;
         fitness > max ? max = fitness : 0;
     }
     average = sum_fitness/options.population_size;
+}
 
-        //TEST
-        // std::cout << "SUM FITNESS = " << sum_fitness << std::endl;
+void Population::stats_o()
+{
+    sum_objective = 0;
+    min_objective = max_objective = members[0].get_objective_value();
+    double objective_value = -1;
+    for(int i = 0; i < options.population_size; i++)
+    {
+        objective_value = members[i].get_objective_value();
+
+        sum_objective += objective_value;
+        objective_value < min_objective ? min_objective = objective_value : 0;
+        objective_value > max_objective ? max_objective = objective_value : 0;
+    }
+    average_objective = sum_objective/options.population_size;
 }
 
 void Population::report(int generation)
 {
     std::ofstream out(options.output_file, std::ios::app);
     out << std::fixed << std::setprecision(options.print_precision) << generation << ",\t\t" << min << ",\t\t" << average << ",\t\t" << max << "," << std::endl;
+    out.close();
+}
+
+void Population::report_o(int generation)
+{
+    std::ofstream out(options.output_file_o, std::ios::app);
+    out << std::fixed << std::setprecision(options.print_precision_o) << generation << ",\t\t" << min_objective << ",\t\t" << average_objective << ",\t\t" << max_objective << "," << std::endl;
     out.close();
 }
 
@@ -176,9 +169,6 @@ void Population::generation(Population* child, int srand_offset)
         parent_index_1 = proportional_selection(srand_offset*options.population_size + i);
         parent_index_2 = proportional_selection(srand_offset*options.population_size + i + 1);
 
-        //TEST
-        // std::cout << "Gen["<< srand_offset << "]: Parent[" << parent_index_1 << "] & Parent[" << parent_index_2 << "]" << std::endl;
-
         child_index_1 = i;
         child_index_2 = i+1;
 
@@ -187,19 +177,52 @@ void Population::generation(Population* child, int srand_offset)
         child_1 = &(child->members[child_index_1]);
         child_2 = &(child->members[child_index_2]);
 
-        //TEST
-        // std::cout << "GEN = " << srand_offset << std::endl;
-        // std::cout << "INDIVIDUAL = " << i << std::endl;
-        // std::cout << "OFFSET = " << srand_offset*options.population_size << std::endl;
-
-        //REAL
         xover_mutate(parent_1, parent_2, child_1, child_2, srand_offset*options.population_size + i);
+    }
 
-        //TEST
-        // std::cout << "parent population AFTER generation:" << std::endl;
-        // print_pop();
-        // std::cout << "child population AFTER generation:" << std::endl;
-        // child->print_pop();
+}
+
+void Population::CHC_generation(Population* child, Population* temp)
+{
+    int index = -1;
+    for(int j = 0; j < options.population_size; j++)
+    {
+        double fitness = 0;
+        for(int i = 0; i < options.population_size*2; i++)
+        {
+            if(i < options.population_size)
+            {
+                if(members[i].get_fitness() >= fitness)
+                {
+                    fitness = members[i].get_fitness();
+                    index = i;
+                }
+            }
+            else
+            {
+                if(child->get_members()[i - options.population_size].get_fitness() >= fitness)
+                {
+                    fitness = child->get_members()[i - options.population_size].get_fitness();
+                    index = i;
+                }
+            }
+        }
+
+        if(index < options.population_size)
+        {
+            temp->members[j] = members[index];
+            members[index].set_fitness(-1);
+        }
+        else
+        {
+            temp->members[j] = child->get_members()[index - options.population_size];
+            child->get_members()[index - options.population_size].set_fitness(-1);
+        }
+    }
+
+    for(int i = 0; i < options.population_size; i++)
+    {
+        child->get_members()[i] = temp->members[i];
     }
 }
 
@@ -230,15 +253,8 @@ void Population::xover_mutate(Individual* parent_1, Individual* parent_2, Indivi
         child_2->get_chromosome()[i] = parent_2->get_chromosome()[i];
     }
 
-    //REAL
     if(flip(options.probability_x, options.random_seed, srand_offset))
-     one_point_xover(parent_1, parent_2, child_1, child_2, srand_offset);
-    //TEST
-    // if(flip(options.probability_x, options.random_seed, srand_offset))
-    // {
-    //     // std::cout << "XOVER!!!" << std::endl;
-    //     one_point_xover(parent_1, parent_2, child_1, child_2, srand_offset);
-    // }
+        one_point_xover(parent_1, parent_2, child_1, child_2, srand_offset);
 
     child_1->mutate(options.probability_mutation, options.random_seed, srand_offset);
     child_2->mutate(options.probability_mutation, options.random_seed, srand_offset);
@@ -248,9 +264,6 @@ void Population::xover_mutate(Individual* parent_1, Individual* parent_2, Indivi
 void Population::one_point_xover(Individual* parent_1, Individual* parent_2, Individual* child_1, Individual* child_2, int srand_offset)
 {
     int index = random_index_in_range(0, options.chromosome_length, options.random_seed, srand_offset);
-
-    //TEST
-    // std::cout << "XOVER INDEX = " << index << std::endl;
 
     for(int i = index + 1; i < options.chromosome_length; i++)
     {

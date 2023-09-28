@@ -7,6 +7,7 @@ class GA
     public:
         Population *parent;
         Population *child;
+        Population *temp;
         Options options;
 
         GA(int argc, char *argv[], int eval_option);

@@ -12,6 +12,7 @@ class Population
         Options options;
         Individual* members = nullptr;
         double average, max, min, sum_fitness;
+        double average_objective, max_objective, min_objective, sum_objective;
 
         //MEMBERS FOR TESTING PROBABILITY ACCURACY
         double proportional_fitnesses[4];
@@ -35,8 +36,11 @@ class Population
         void get_member_chosen_stats();
 
         void evaluate(int choice, int random_seed, int srand_offset);
+        void evaluate_o(int choice, int random_seed, int srand_offset);
         void stats();
+        void stats_o();
         void report(int);
+        void report_o(int);
         void generation(Population* child, int srand_offset);
         void CHC_generation(Population* child, Population* temp);
         int proportional_selection(int srand_offset);

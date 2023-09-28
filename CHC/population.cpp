@@ -103,6 +103,17 @@ void Population::evaluate(int choice, int random_seed, int srand_offset)
     }
 }
 
+//choice chooses which objective function to evaluate
+void Population::evaluate_o(int choice, int random_seed, int srand_offset)
+{
+    double objective_value = -1;
+    for(int i = 0; i < options.population_size; i++)
+    {
+        objective_value = eval_o(members[i], choice, random_seed, srand_offset + i);
+        members[i].set_objective_value(objective_value);
+    }
+}
+
 void Population::stats()
 {
     sum_fitness = 0;
@@ -119,10 +130,33 @@ void Population::stats()
     average = sum_fitness/options.population_size;
 }
 
+void Population::stats_o()
+{
+    sum_objective = 0;
+    min_objective = max_objective = members[0].get_objective_value();
+    double objective_value = -1;
+    for(int i = 0; i < options.population_size; i++)
+    {
+        objective_value = members[i].get_objective_value();
+
+        sum_objective += objective_value;
+        objective_value < min_objective ? min_objective = objective_value : 0;
+        objective_value > max_objective ? max_objective = objective_value : 0;
+    }
+    average_objective = sum_objective/options.population_size;
+}
+
 void Population::report(int generation)
 {
     std::ofstream out(options.output_file, std::ios::app);
     out << std::fixed << std::setprecision(options.print_precision) << generation << ",\t\t" << min << ",\t\t" << average << ",\t\t" << max << "," << std::endl;
+    out.close();
+}
+
+void Population::report_o(int generation)
+{
+    std::ofstream out(options.output_file_o, std::ios::app);
+    out << std::fixed << std::setprecision(options.print_precision_o) << generation << ",\t\t" << min_objective << ",\t\t" << average_objective << ",\t\t" << max_objective << "," << std::endl;
     out.close();
 }
 

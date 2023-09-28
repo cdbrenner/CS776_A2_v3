@@ -3,7 +3,7 @@
 
 int main(int argc, char* argv[])
 {
-    for(int i = 2; i <= 2; i++)
+    for(int i = 5; i <= 5; i++)
     {
         GA ga(argc, argv, i);
 
